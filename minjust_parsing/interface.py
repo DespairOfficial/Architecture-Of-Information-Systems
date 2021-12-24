@@ -18,7 +18,7 @@ class Window(QMainWindow):
     def __init__(self):
         super(Window, self).__init__()
         
-        self.setWindowTitle( "Table")
+        self.setWindowTitle("Table")
         self.setGeometry(100,100,1500,768)
  
         central_widget = QWidget(self)                  # Создаём центральный виджет
@@ -41,17 +41,17 @@ class Window(QMainWindow):
         self.pageSize15 = QtWidgets.QPushButton(self)
         self.pageSize15.clicked.connect(lambda: self.getPageSize(15))
         self.pageSize15.setText('15')
-        grid.addWidget(self.pageSize15, 0, 0) 
+        grid.addWidget(self.pageSize15, 0, 0, 1, 2) 
 
         self.pageSize30 = QtWidgets.QPushButton(self)
         self.pageSize30.clicked.connect(lambda: self.getPageSize(30))
         self.pageSize30.setText('30')
-        grid.addWidget(self.pageSize30, 0, 1) 
+        grid.addWidget(self.pageSize30, 0, 2,1,2) 
 
         self.pageSize60 = QtWidgets.QPushButton(self)
         self.pageSize60.clicked.connect(lambda: self.getPageSize(60))
         self.pageSize60.setText('60')
-        grid.addWidget(self.pageSize60, 0, 2) 
+        grid.addWidget(self.pageSize60, 0, 4,1,2) 
 
         #делаем ресайз колонок по содержимому
         self.table.resizeColumnsToContents()
@@ -61,22 +61,22 @@ class Window(QMainWindow):
         self.btnBack = QtWidgets.QPushButton(self)
         self.btnBack.clicked.connect(self.pageBackward)
         self.btnBack.setText('Назад')
-        grid.addWidget(self.btnBack, 2, 0) 
+        grid.addWidget(self.btnBack, 2, 1) 
 
         self.btnBack = QtWidgets.QPushButton(self)
         self.btnBack.clicked.connect(self.pageBegin)
         self.btnBack.setText('В начало')
-        grid.addWidget(self.btnBack, 2, 1) 
+        grid.addWidget(self.btnBack, 2, 0) 
         
         self.btnBack = QtWidgets.QPushButton(self)
         self.btnBack.clicked.connect(self.pageEnd)
         self.btnBack.setText('В конец')
-        grid.addWidget(self.btnBack, 2, 2) 
+        grid.addWidget(self.btnBack, 2, 5) 
 
         self.btnForward = QtWidgets.QPushButton(self)
         self.btnForward.clicked.connect(self.pageForward)
         self.btnForward.setText('Вперед')
-        grid.addWidget(self.btnForward, 2, 3 ) 
+        grid.addWidget(self.btnForward, 2, 4 ) 
 
 
 
@@ -97,7 +97,7 @@ class Window(QMainWindow):
         self.labelAccName = QtWidgets.QLabel(self)
         self.labelAccName.setText('Учетный номер')
         
-        grid.addWidget(self.labelNko, 3, 1 ) 
+        grid.addWidget(self.labelAccName, 3, 1 ) 
 
         self.inputAccName = QtWidgets.QLineEdit(self)
         grid.addWidget(self.inputAccName, 4, 1 ) 
@@ -162,6 +162,11 @@ class Window(QMainWindow):
         self.confirmPeriod.setText('Найти')
         grid.addWidget(self.confirmPeriod, 5, 5 )
 
+        self.globalFindBtn = QtWidgets.QPushButton(self)
+        self.globalFindBtn.clicked.connect(self.globalFind)
+        self.globalFindBtn.setText('Найти')
+        grid.addWidget(self.globalFindBtn, 6, 0, 1 , 6 )
+
         self.findTable = QTableWidget(self)  # Создаём таблицу
         self.findTable.setColumnCount(6)     # Устанавливаем колонки
         self.findTable.setHorizontalHeaderLabels(["Наименование НКО", "Учетный номер", "ОГРН","Форма","Вид отчета","Период"])
@@ -176,6 +181,7 @@ class Window(QMainWindow):
 
     def fillTable(self,cursor):
         # self.pageSize*(self.page)
+        self.table.setMinimumHeight(400)
         self.table.setRowCount(0)
         rowCounter = 0
         for row in cursor:
@@ -259,8 +265,25 @@ class Window(QMainWindow):
     def periodFind(self):
         cursor.execute(f"SELECT * FROM nko_table WHERE period = '{self.inputPeriod.text()}'")
         self.fillFindTable(cursor)
-
-
+    def globalFind(self):
+        findParams = ''
+        if (self.inputPeriod.text()):
+            findParams += f" period = '{self.inputPeriod.text()}' and"
+        if (self.inputTypeReport.text()):
+            findParams += f" type_of_report = '{self.inputTypeReport.text()}' and"
+        if (self.inputForm.text()):
+            findParams += f" form = '{self.inputForm.text()}' and"
+        if (self.inputMSRN.text()):
+            findParams += f" msrn = '{self.inputMSRN.text()}' and"
+        if (self.inputAccName.text()):
+            findParams += f" acc_name = '{self.inputAccName.text()}' and"
+        if (self.inputNko.text()):
+            findParams += f" nko_name = '{self.inputNko.text()}' and"
+        findParams = findParams[:-3:]
+        print(findParams)
+        cursor.execute(f"SELECT * FROM nko_table WHERE {findParams}")
+        self.fillFindTable(cursor)
+        
 def application():
     app = QApplication(sys.argv)
     window  = Window()
