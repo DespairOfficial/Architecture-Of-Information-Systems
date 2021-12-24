@@ -10,10 +10,11 @@ conn = psycopg2.connect(dbname='minjust', user='postgres',
 cursor = conn.cursor()
 
 class Window(QMainWindow):
-    
+    paramsList = []
     page = 0
     pageSize = 15
     sortAsc = False
+    sortAscFind = False
     orderBy = ''
     def __init__(self):
         super(Window, self).__init__()
@@ -88,10 +89,10 @@ class Window(QMainWindow):
         self.inputNko = QtWidgets.QLineEdit(self)
         grid.addWidget(self.inputNko, 4, 0 ) 
 
-        self.confirmNko = QtWidgets.QPushButton(self)
-        self.confirmNko.clicked.connect(self.nkoFind)
-        self.confirmNko.setText('Найти')
-        grid.addWidget(self.confirmNko, 5, 0 ) 
+        # self.confirmNko = QtWidgets.QPushButton(self)
+        # self.confirmNko.clicked.connect(self.nkoFind)
+        # self.confirmNko.setText('Найти')
+        # grid.addWidget(self.confirmNko, 5, 0 ) 
 
 
         self.labelAccName = QtWidgets.QLabel(self)
@@ -102,10 +103,10 @@ class Window(QMainWindow):
         self.inputAccName = QtWidgets.QLineEdit(self)
         grid.addWidget(self.inputAccName, 4, 1 ) 
 
-        self.confirmAccName = QtWidgets.QPushButton(self)
-        self.confirmAccName.clicked.connect(self.accNameFind)
-        self.confirmAccName.setText('Найти')
-        grid.addWidget(self.confirmAccName, 5, 1 ) 
+        # self.confirmAccName = QtWidgets.QPushButton(self)
+        # self.confirmAccName.clicked.connect(self.accNameFind)
+        # self.confirmAccName.setText('Найти')
+        # grid.addWidget(self.confirmAccName, 5, 1 ) 
 
 
         self.labelMSRN = QtWidgets.QLabel(self)
@@ -115,10 +116,10 @@ class Window(QMainWindow):
         self.inputMSRN = QtWidgets.QLineEdit(self)
         grid.addWidget(self.inputMSRN, 4, 2 ) 
 
-        self.confirmMSRN = QtWidgets.QPushButton(self)
-        self.confirmMSRN.clicked.connect(self.msrnFind)
-        self.confirmMSRN.setText('Найти')
-        grid.addWidget(self.confirmMSRN, 5, 2 ) 
+        # self.confirmMSRN = QtWidgets.QPushButton(self)
+        # self.confirmMSRN.clicked.connect(self.msrnFind)
+        # self.confirmMSRN.setText('Найти')
+        # grid.addWidget(self.confirmMSRN, 5, 2 ) 
 
 
 
@@ -129,10 +130,10 @@ class Window(QMainWindow):
         self.inputForm = QtWidgets.QLineEdit(self)
         grid.addWidget(self.inputForm, 4, 3 ) 
 
-        self.confirmForm = QtWidgets.QPushButton(self)
-        self.confirmForm.clicked.connect(self.formFind)
-        self.confirmForm.setText('Найти')
-        grid.addWidget(self.confirmForm, 5, 3 ) 
+        # self.confirmForm = QtWidgets.QPushButton(self)
+        # self.confirmForm.clicked.connect(self.formFind)
+        # self.confirmForm.setText('Найти')
+        # grid.addWidget(self.confirmForm, 5, 3 ) 
 
 
 
@@ -143,10 +144,10 @@ class Window(QMainWindow):
         self.inputTypeReport = QtWidgets.QLineEdit(self)
         grid.addWidget(self.inputTypeReport, 4, 4 ) 
 
-        self.confirmTypeReport = QtWidgets.QPushButton(self)
-        self.confirmTypeReport.clicked.connect(self.typeReportFind)
-        self.confirmTypeReport.setText('Найти')
-        grid.addWidget(self.confirmTypeReport, 5, 4 ) 
+        # self.confirmTypeReport = QtWidgets.QPushButton(self)
+        # self.confirmTypeReport.clicked.connect(self.typeReportFind)
+        # self.confirmTypeReport.setText('Найти')
+        # grid.addWidget(self.confirmTypeReport, 5, 4 ) 
 
 
 
@@ -157,10 +158,10 @@ class Window(QMainWindow):
         self.inputPeriod = QtWidgets.QLineEdit(self)
         grid.addWidget(self.inputPeriod, 4, 5 ) 
 
-        self.confirmPeriod = QtWidgets.QPushButton(self)
-        self.confirmPeriod.clicked.connect(self.periodFind)
-        self.confirmPeriod.setText('Найти')
-        grid.addWidget(self.confirmPeriod, 5, 5 )
+        # self.confirmPeriod = QtWidgets.QPushButton(self)
+        # self.confirmPeriod.clicked.connect(self.periodFind)
+        # self.confirmPeriod.setText('Найти')
+        # grid.addWidget(self.confirmPeriod, 5, 5 )
 
         self.globalFindBtn = QtWidgets.QPushButton(self)
         self.globalFindBtn.clicked.connect(self.globalFind)
@@ -170,7 +171,7 @@ class Window(QMainWindow):
         self.findTable = QTableWidget(self)  # Создаём таблицу
         self.findTable.setColumnCount(6)     # Устанавливаем колонки
         self.findTable.setHorizontalHeaderLabels(["Наименование НКО", "Учетный номер", "ОГРН","Форма","Вид отчета","Период"])
-        self.findTable.horizontalHeader().sectionClicked.connect(self.onHeaderClicked)
+        self.findTable.horizontalHeader().sectionClicked.connect(self.onHeaderClickedFind)
         self.findTable.resizeColumnsToContents()
         grid.addWidget(self.findTable, 7, 0, 1, 7 ) 
 
@@ -192,7 +193,7 @@ class Window(QMainWindow):
                 itemCounter += 1
             rowCounter +=1
     def fillFindTable(self,cursor):
-        self.table.setColumnWidth(0,400)
+        
         self.findTable.setRowCount(0)
         rowCounter = 0
         for row in cursor:
@@ -203,6 +204,7 @@ class Window(QMainWindow):
                 itemCounter += 1
             rowCounter +=1
         self.findTable.resizeColumnsToContents()
+        self.findTable.setColumnWidth(0,400)
 
     def onHeaderClicked(self,logicalIndex):
         self.page -=1
@@ -211,7 +213,24 @@ class Window(QMainWindow):
         self.orderBy = f'ORDER BY {logicalIndex+1} {self.sortMode} '
         cursor.execute(f"SELECT * FROM nko_table {self.orderBy} LIMIT {self.pageSize} ")
         self.fillTable(cursor)
-        
+
+
+    def onHeaderClickedFind(self, logicalIndex):
+        self.sortAscFind = not self.sortAscFind
+        self.sortModeFind = 'ASC' if self.sortAscFind else 'DESC'
+        self.orderBy = f'ORDER BY {logicalIndex+1} {self.sortModeFind} '
+
+        findParams = 'WHERE'
+        for param in self.paramsList:
+            findParams += param + ' and'
+
+        if(findParams=='WHERE'):
+            findParams = ''
+        elif(findParams[-3::]=='and'):
+            findParams=findParams[:-3:]
+
+        cursor.execute(f"SELECT * FROM nko_table {findParams} {self.orderBy} ")
+        self.fillFindTable(cursor)
         
     def pageBackward(self):
         if(not (self.page == 0) ):
@@ -224,7 +243,6 @@ class Window(QMainWindow):
 
     def pageForward(self):
         self.page +=1
-        print(self.pageSize*self.page)
         cursor.execute(f"SELECT * FROM nko_table {self.orderBy} LIMIT {self.pageSize} OFFSET {self.pageSize*self.page}")
         self.fillTable(cursor)
 
@@ -246,42 +264,52 @@ class Window(QMainWindow):
         cursor.execute(f"SELECT * FROM nko_table {self.orderBy}  LIMIT {self.pageSize} OFFSET {self.pageSize*(self.page-1)}")
         self.fillTable(cursor)
 
-    def nkoFind(self):
-        print(self.inputNko.text())
-        cursor.execute(f"SELECT * FROM nko_table WHERE nko_name = '{self.inputNko.text()}'")
-        self.fillFindTable(cursor)
-    def accNameFind(self):
-        cursor.execute(f"SELECT * FROM nko_table WHERE acc_name = '{self.inputAccName.text()}'")
-        self.fillFindTable(cursor)
-    def msrnFind(self):
-        cursor.execute(f"SELECT * FROM nko_table WHERE msrn = '{self.inputMSRN.text()}'")
-        self.fillFindTable(cursor)
-    def formFind(self):
-        cursor.execute(f"SELECT * FROM nko_table WHERE form = '{self.inputForm.text()}'")
-        self.fillFindTable(cursor)
-    def typeReportFind(self):
-        cursor.execute(f"SELECT * FROM nko_table WHERE type_of_report = '{self.inputTypeReport.text()}'")
-        self.fillFindTable(cursor)
-    def periodFind(self):
-        cursor.execute(f"SELECT * FROM nko_table WHERE period = '{self.inputPeriod.text()}'")
-        self.fillFindTable(cursor)
+    # def nkoFind(self):
+    #     print(self.inputNko.text())
+    #     cursor.execute(f"SELECT * FROM nko_table WHERE nko_name = '{self.inputNko.text()}'")
+    #     self.fillFindTable(cursor)
+    # def accNameFind(self):
+    #     cursor.execute(f"SELECT * FROM nko_table WHERE acc_name = '{self.inputAccName.text()}'")
+    #     self.fillFindTable(cursor)
+    # def msrnFind(self):
+    #     cursor.execute(f"SELECT * FROM nko_table WHERE msrn = '{self.inputMSRN.text()}'")
+    #     self.fillFindTable(cursor)
+    # def formFind(self):
+    #     cursor.execute(f"SELECT * FROM nko_table WHERE form = '{self.inputForm.text()}'")
+    #     self.fillFindTable(cursor)
+    # def typeReportFind(self):
+    #     cursor.execute(f"SELECT * FROM nko_table WHERE type_of_report = '{self.inputTypeReport.text()}'")
+    #     self.fillFindTable(cursor)
+    # def periodFind(self):
+    #     cursor.execute(f"SELECT * FROM nko_table WHERE period = '{self.inputPeriod.text()}'")
+    #     self.fillFindTable(cursor)
+
     def globalFind(self):
-        findParams = ''
+        self.paramsList.clear()
+
         if (self.inputPeriod.text()):
-            findParams += f" period = '{self.inputPeriod.text()}' and"
+            self.paramsList.append(f" period = '{self.inputPeriod.text()}'")  
         if (self.inputTypeReport.text()):
-            findParams += f" type_of_report = '{self.inputTypeReport.text()}' and"
+            self.paramsList.append(f" type_of_report = '{self.inputTypeReport.text()}'")
         if (self.inputForm.text()):
-            findParams += f" form = '{self.inputForm.text()}' and"
+            self.paramsList.append(f" form = '{self.inputForm.text()}'")
         if (self.inputMSRN.text()):
-            findParams += f" msrn = '{self.inputMSRN.text()}' and"
+            self.paramsList.append(f" msrn = '{self.inputMSRN.text()}'")
         if (self.inputAccName.text()):
-            findParams += f" acc_name = '{self.inputAccName.text()}' and"
+            self.paramsList.append(f" acc_name = '{self.inputAccName.text()}'")
         if (self.inputNko.text()):
-            findParams += f" nko_name = '{self.inputNko.text()}' and"
-        findParams = findParams[:-3:]
-        print(findParams)
-        cursor.execute(f"SELECT * FROM nko_table WHERE {findParams}")
+            self.paramsList.append(f" nko_name = '{self.inputNko.text()}'")
+        findParams = 'WHERE'
+        for param in self.paramsList:
+            findParams += param + ' and'
+
+        if(findParams=='WHERE'):
+            findParams = ''
+        elif(findParams[-3::]=='and'):
+            findParams=findParams[:-3:]
+
+            
+        cursor.execute(f"SELECT * FROM nko_table {findParams}")
         self.fillFindTable(cursor)
         
 def application():
