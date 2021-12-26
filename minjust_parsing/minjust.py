@@ -1,5 +1,4 @@
 import json
-from time import sleep
 from selenium import webdriver
 from selenium.webdriver.chrome import options
 from fake_useragent import UserAgent
@@ -19,24 +18,9 @@ browser = webdriver.Chrome(executable_path=EXE_PATH, options = options)
 
 url = "http://unro.minjust.ru/NKOReports.aspx?request_type=nko"
 
-
-# def append_to_json(_dict,path):
-#     with open(path, 'ab+') as f:
-#         f.seek(0,2)
-#         if(f.tell()==0):
-#             f.write(json.dumps([_dict]).encode())
-#         else:
-#             f.seek(-1,2)
-#             f.truncate()
-#             f.write(' , '.encode(encoding='utf-8'))
-#             f.write(json.dumps(_dict).encode(encoding='utf-8'))
-#             f.write(']'.encode(encoding='utf-8'))
 conn = psycopg2.connect(dbname='minjust', user='postgres', 
                         password='2718', host='localhost' , port=5432)
 cursor = conn.cursor()
-
-
-
 
 counterTrs = 0
 try:
@@ -51,7 +35,7 @@ try:
     for j in range(0,1):
         
         print(f'Parsing page {j+1}')
-        table = browser.find_element('id','pdg')
+        table = browser.find_element('id','pdg') 
         trs = table.find_elements('tag name','tr')
         for i in range(0,10):
             trs.pop(0)
@@ -74,16 +58,16 @@ try:
                         "Период": tdsList[5]
                     }
                     BIGARRAY.append(newData)
-                    # cursor.execute("INSERT INTO nko_table (nko_name, acc_name,msrn,form,type_of_report,period) VALUES (%s, %s, %s, %s, %s, %s)",
-                    # (tdsList[0],tdsList[1],tdsList[2],tdsList[3],tdsList[4],tdsList[5]))
-                    # conn.commit()
+                    cursor.execute("INSERT INTO nko_table (nko_name, acc_name,msrn,form,type_of_report,period) VALUES (%s, %s, %s, %s, %s, %s)",
+                    (tdsList[0],tdsList[1],tdsList[2],tdsList[3],tdsList[4],tdsList[5]))
+                    conn.commit()
         nextPageButton = WebDriverWait(browser,30).until(lambda b: b.find_element('id','pdg_next'))
         action = ActionChains(browser)
-
-
         action.move_to_element(nextPageButton).click().perform()
-    # with open("data.json", "w", encoding = 'utf-8') as file:
-    #     json.dump(BIGARRAY, file,indent=4, ensure_ascii=False, sort_keys=False)    
+
+
+    with open("data.json", "w", encoding = 'utf-8') as file:
+        json.dump(BIGARRAY, file,indent=4, ensure_ascii=False, sort_keys=False)    
         
 except Exception as ex:
     print(ex)

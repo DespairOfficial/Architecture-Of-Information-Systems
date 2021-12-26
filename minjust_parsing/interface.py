@@ -89,11 +89,6 @@ class Window(QMainWindow):
         self.inputNko = QtWidgets.QLineEdit(self)
         grid.addWidget(self.inputNko, 4, 0 ) 
 
-        # self.confirmNko = QtWidgets.QPushButton(self)
-        # self.confirmNko.clicked.connect(self.nkoFind)
-        # self.confirmNko.setText('Найти')
-        # grid.addWidget(self.confirmNko, 5, 0 ) 
-
 
         self.labelAccName = QtWidgets.QLabel(self)
         self.labelAccName.setText('Учетный номер')
@@ -103,23 +98,12 @@ class Window(QMainWindow):
         self.inputAccName = QtWidgets.QLineEdit(self)
         grid.addWidget(self.inputAccName, 4, 1 ) 
 
-        # self.confirmAccName = QtWidgets.QPushButton(self)
-        # self.confirmAccName.clicked.connect(self.accNameFind)
-        # self.confirmAccName.setText('Найти')
-        # grid.addWidget(self.confirmAccName, 5, 1 ) 
-
-
         self.labelMSRN = QtWidgets.QLabel(self)
         self.labelMSRN.setText('ОГРН')
         grid.addWidget(self.labelMSRN, 3, 2 ) 
 
         self.inputMSRN = QtWidgets.QLineEdit(self)
         grid.addWidget(self.inputMSRN, 4, 2 ) 
-
-        # self.confirmMSRN = QtWidgets.QPushButton(self)
-        # self.confirmMSRN.clicked.connect(self.msrnFind)
-        # self.confirmMSRN.setText('Найти')
-        # grid.addWidget(self.confirmMSRN, 5, 2 ) 
 
 
 
@@ -130,12 +114,6 @@ class Window(QMainWindow):
         self.inputForm = QtWidgets.QLineEdit(self)
         grid.addWidget(self.inputForm, 4, 3 ) 
 
-        # self.confirmForm = QtWidgets.QPushButton(self)
-        # self.confirmForm.clicked.connect(self.formFind)
-        # self.confirmForm.setText('Найти')
-        # grid.addWidget(self.confirmForm, 5, 3 ) 
-
-
 
         self.labelTypeReport = QtWidgets.QLabel(self)
         self.labelTypeReport.setText('Вид отчёта')
@@ -143,11 +121,6 @@ class Window(QMainWindow):
 
         self.inputTypeReport = QtWidgets.QLineEdit(self)
         grid.addWidget(self.inputTypeReport, 4, 4 ) 
-
-        # self.confirmTypeReport = QtWidgets.QPushButton(self)
-        # self.confirmTypeReport.clicked.connect(self.typeReportFind)
-        # self.confirmTypeReport.setText('Найти')
-        # grid.addWidget(self.confirmTypeReport, 5, 4 ) 
 
 
 
@@ -158,22 +131,17 @@ class Window(QMainWindow):
         self.inputPeriod = QtWidgets.QLineEdit(self)
         grid.addWidget(self.inputPeriod, 4, 5 ) 
 
-        # self.confirmPeriod = QtWidgets.QPushButton(self)
-        # self.confirmPeriod.clicked.connect(self.periodFind)
-        # self.confirmPeriod.setText('Найти')
-        # grid.addWidget(self.confirmPeriod, 5, 5 )
-
         self.globalFindBtn = QtWidgets.QPushButton(self)
         self.globalFindBtn.clicked.connect(self.globalFind)
         self.globalFindBtn.setText('Найти')
-        grid.addWidget(self.globalFindBtn, 6, 0, 1 , 6 )
+        grid.addWidget(self.globalFindBtn, 6, 0, 2 , 6 )
 
         self.findTable = QTableWidget(self)  # Создаём таблицу
         self.findTable.setColumnCount(6)     # Устанавливаем колонки
         self.findTable.setHorizontalHeaderLabels(["Наименование НКО", "Учетный номер", "ОГРН","Форма","Вид отчета","Период"])
         self.findTable.horizontalHeader().sectionClicked.connect(self.onHeaderClickedFind)
         self.findTable.resizeColumnsToContents()
-        grid.addWidget(self.findTable, 7, 0, 1, 7 ) 
+        grid.addWidget(self.findTable, 8, 0, 1, 7 ) 
 
 
         grid.setSpacing(20)
@@ -181,7 +149,6 @@ class Window(QMainWindow):
 
 
     def fillTable(self,cursor):
-        # self.pageSize*(self.page)
         self.table.setMinimumHeight(400)
         self.table.setRowCount(0)
         rowCounter = 0
@@ -264,26 +231,6 @@ class Window(QMainWindow):
         cursor.execute(f"SELECT * FROM nko_table {self.orderBy}  LIMIT {self.pageSize} OFFSET {self.pageSize*(self.page-1)}")
         self.fillTable(cursor)
 
-    # def nkoFind(self):
-    #     print(self.inputNko.text())
-    #     cursor.execute(f"SELECT * FROM nko_table WHERE nko_name = '{self.inputNko.text()}'")
-    #     self.fillFindTable(cursor)
-    # def accNameFind(self):
-    #     cursor.execute(f"SELECT * FROM nko_table WHERE acc_name = '{self.inputAccName.text()}'")
-    #     self.fillFindTable(cursor)
-    # def msrnFind(self):
-    #     cursor.execute(f"SELECT * FROM nko_table WHERE msrn = '{self.inputMSRN.text()}'")
-    #     self.fillFindTable(cursor)
-    # def formFind(self):
-    #     cursor.execute(f"SELECT * FROM nko_table WHERE form = '{self.inputForm.text()}'")
-    #     self.fillFindTable(cursor)
-    # def typeReportFind(self):
-    #     cursor.execute(f"SELECT * FROM nko_table WHERE type_of_report = '{self.inputTypeReport.text()}'")
-    #     self.fillFindTable(cursor)
-    # def periodFind(self):
-    #     cursor.execute(f"SELECT * FROM nko_table WHERE period = '{self.inputPeriod.text()}'")
-    #     self.fillFindTable(cursor)
-
     def globalFind(self):
         self.paramsList.clear()
 
@@ -315,10 +262,7 @@ class Window(QMainWindow):
 def application():
     app = QApplication(sys.argv)
     window  = Window()
-
-
     window.show()
-
     sys.exit(app.exec_())
 
 if __name__ == '__main__':
